@@ -1,3 +1,12 @@
+# build dir
+bin
+
+# config file (sensitive info!)
+config.json
+
+# editor files
+.idea
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
