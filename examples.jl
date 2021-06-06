@@ -5,5 +5,10 @@ using Pkg
 
 Pkg.activate(".")
 import MiningProfit
-MiningProfit.main()
+
+MiningProfit.updateallstats()
+
+config_json = MiningProfit.Config.loadconfig()
+MiningProfit.ApiTools.miningpoolhub_getbalance(
+    config_json["miningpoolhub"]["apikey"])
 

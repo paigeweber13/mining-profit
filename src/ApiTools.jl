@@ -15,7 +15,6 @@ function miningpoolhub_getbalance(apikey::String)
         path=MININGPOOLHUB_PATH, query=query_miningpoolhub_balance)
     # "https://ethereum.miningpoolhub.com/index.php?page=api&action=getuserbalance"
     
-    println("Url: ", url_getbalance)
     r = HTTP.get(url_getbalance)
     # println("Response: ", String(r.body))
     response_json = JSON.parse(String(r.body))
