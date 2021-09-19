@@ -1,7 +1,10 @@
-using ArgParse
 using Pkg
-
 Pkg.activate(".")
+
+# third-party imports
+using ArgParse
+
+# first-party imports
 using MiningProfit
 
 function parse_commandline()
@@ -9,7 +12,7 @@ function parse_commandline()
 
     @add_arg_table s begin
         "--get-stats", "-s"
-            help = "Get current balance and hashrate for all configured pools"
+            help = "Get current balance and hashrate for all configured pools and store it to the local sqlite database."
             action = :store_true
         # "--opt1"
         #     help = "an option with an argument"

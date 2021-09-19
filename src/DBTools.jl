@@ -11,7 +11,7 @@ function loadorcreatedb()
   db = SQLite.DB("historical-data.sqlite")
 
   try
-    DBInterface.execute(db, "SELECT id FROM " * TABLE_NAME)
+    DBInterface.execute(db, "SELECT pool FROM " * TABLE_NAME)
   catch e
     if e == SQLite.SQLiteException("no such table: mining_stats")
       println("There appears to be no existing data, creating new tables...")
@@ -36,7 +36,6 @@ function insertminingdata(pool, datetime, hashrate, balance)
     pool, datetime, hashrate, balance)
 
   result = DBInterface.execute(db, qs)
-  println(result)
 end
 
 end # module
