@@ -2,6 +2,7 @@ module MiningProfit
 
 include("ApiTools.jl")
 include("Config.jl")
+include("DBTools.jl")
 
 
 function updateallstats() 

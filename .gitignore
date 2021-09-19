@@ -1,3 +1,6 @@
+# data
+*.sqlite
+
 # build dir
 bin
 
