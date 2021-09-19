@@ -2,7 +2,7 @@
 *.sqlite
 
 # build dir
-bin
+build
 
 # config file (sensitive info!)
 config.json
