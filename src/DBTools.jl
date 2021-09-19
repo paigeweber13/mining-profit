@@ -1,5 +1,6 @@
 module DBTools
 
+using Printf
 using SQLite
 using Tables
 
@@ -15,8 +16,8 @@ function loadorcreatedb()
     if e == SQLite.SQLiteException("no such table: mining_stats")
       println("There appears to be no existing data, creating new tables...")
       schema_miningstats = Tables.Schema(
-        ["id", "pool", "datetime", "hashrate", "balance"],
-        [Int, String, String, Float64, Float64]
+        ["pool", "datetime", "hashrate", "balance"],
+        [String, String, Float64, Float64]
       )
       SQLite.createtable!(db, "mining_stats", schema_miningstats)
     else
@@ -27,6 +28,15 @@ function loadorcreatedb()
   end
 
   return db
+end
+
+function insertminingdata(pool, datetime, hashrate, balance)
+  db = loadorcreatedb()
+  qs = @sprintf("INSERT INTO %s VALUES ('%s', '%s', '%s', '%s');", TABLE_NAME,
+    pool, datetime, hashrate, balance)
+
+  result = DBInterface.execute(db, qs)
+  println(result)
 end
 
 end # module
