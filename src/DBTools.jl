@@ -3,34 +3,27 @@ module DBTools
 using SQLite
 using Tables
 
+TABLE_NAME = "mining_stats"
+ERROR_UNHANDLED_SQLITE_EXCEPTION = 1
 
 function loadorcreatedb()
   db = SQLite.DB("historical-data.sqlite")
 
-  tables = SQLite.tables(db)
-  println(tables)
-  println(tables[1])
-  #println(size(tables))
-  println(size(tables[1]))
-  println(tables.name)
-  println(size(tables.name))
-
-  if size(tables.name) == (0,)
-    println("There appears to be no existing data, creating new tables...")
-    schema_miningstats = Tables.Schema(
-      ["id", "pool", "datetime", "hashrate", "balance"],
-      [Int, String, String, Float64, Float64]
-    )
-    SQLite.createtable!(db, "mining_stats", schema_miningstats)
-    # DBInterface.execute(db, """
-    #   CREATE TABLE mining_stats(
-    #     id INTEGER NOT NULL PRIMARY KEY,
-    #     pool TEXT NOT NULL,
-    #     datetime TEXT NOT NULL,
-    #     hashrate REAL,
-    #     balance REAL
-    #   )
-    # """)
+  try
+    DBInterface.execute(db, "SELECT id FROM " * TABLE_NAME)
+  catch e
+    if e == SQLite.SQLiteException("no such table: mining_stats")
+      println("There appears to be no existing data, creating new tables...")
+      schema_miningstats = Tables.Schema(
+        ["id", "pool", "datetime", "hashrate", "balance"],
+        [Int, String, String, Float64, Float64]
+      )
+      SQLite.createtable!(db, "mining_stats", schema_miningstats)
+    else
+      println("ERROR: unhandled sqlite exception: ")
+      println(e)
+      exit(ERROR_UNHANDLED_SQLITE_EXCEPTION)
+    end
   end
 
   return db
