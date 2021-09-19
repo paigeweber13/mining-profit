@@ -21,4 +21,15 @@ function miningpoolhub_getbalance(apikey::String)
     return response_json["getuserbalance"]["data"]
 end
 
+function miningpoolhub_gethashrate(apikey::String)
+    query_miningpoolhub_hashrate = Dict([("page", "api"), 
+        ("action", "getuserhashrate"), ("api_key", apikey)])
+    url_getbalance = URIs.URI(scheme=SCHEME, host=MININGPOOLHUB_HOST,
+        path=MININGPOOLHUB_PATH, query=query_miningpoolhub_hashrate)
+    
+    r = HTTP.get(url_getbalance)
+    response_json = JSON.parse(String(r.body))
+    return response_json["getuserhashrate"]["data"]
+end
+
 end # module
