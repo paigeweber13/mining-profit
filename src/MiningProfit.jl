@@ -19,6 +19,11 @@ function updateallstats()
         cfg["miningpoolhub"]["apikey"]) * KH_TO_MH
     DBTools.insertminingdata("miningpoolhub", datestring, mph_hashrate, 
       mph_balance["confirmed"])
+
+    # ezil
+    ezil_balance = ApiTools.ezil_getbalance(cfg["ezil"]["combinedwallet"])
+    ezil_hashrate = ApiTools.ezil_gethashrate(cfg["ezil"]["combinedwallet"])
+    DBTools.insertminingdata("ezil", datestring, ezil_hashrate, ezil_balance)
 end
 
 end # module
