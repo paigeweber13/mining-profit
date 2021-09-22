@@ -1,5 +1,8 @@
 {
   "miningpoolhub": {
     "apikey": "my-key"
+  },
+  "ezil": {
+    "combinedwallet": "ethwallet.zilwallet"
   }
 }
