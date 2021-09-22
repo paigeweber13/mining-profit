@@ -4,5 +4,8 @@
   },
   "ezil": {
     "combinedwallet": "ethwallet.zilwallet"
+  },
+  "flexpool": {
+    "wallet": "ethwallet"
   }
 }

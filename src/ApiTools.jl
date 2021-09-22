@@ -10,6 +10,9 @@ const SCHEME = "https"
 const MININGPOOLHUB_HOST = "ethereum.miningpoolhub.com"
 const MININGPOOLHUB_PATH = "/index.php"
 
+const FLEXPOOL_HOST = "api.flexpool.io"
+const FLEXPOOL_PATH_START = "/v2"
+
 function miningpoolhub_getbalance(apikey::String)
     query_miningpoolhub_balance = Dict([("page", "api"), 
         ("action", "getuserbalance"), ("api_key", apikey)])
@@ -57,6 +60,34 @@ function ezil_gethashrate(combinedwallet_str)
     r = HTTP.get(url_gethashrate)
     response_json = JSON.parse(String(r.body))
     return response_json["eth"]["current_hashrate"]
+end
+
+function flexpool_getbalance(wallet)
+    # for some reason, flexpool reports the balance as an integer in increments
+    # of 1e-18 eth. So in their API, 1e18 == 1 eth
+    flexpool_conversion_rate = 1e-18
+
+    flexpool_balance_path = @sprintf("%s/miner/balance", FLEXPOOL_PATH_START)
+    query_flexpool_balance = Dict([("coin", "eth"), ("address", wallet)])
+
+    url_getbalance = URIs.URI(scheme=SCHEME, host=FLEXPOOL_HOST,
+        path=flexpool_balance_path, query=query_flexpool_balance)
+    
+    r = HTTP.get(url_getbalance)
+    response_json = JSON.parse(String(r.body))
+    return response_json["result"]["balance"] * flexpool_conversion_rate
+end
+
+function flexpool_gethashrate(wallet)
+    flexpool_hashrate_path = @sprintf("%s/miner/stats", FLEXPOOL_PATH_START)
+    query_flexpool_hashrate = Dict([("coin", "eth"), ("address", wallet)])
+
+    url_gethashrate = URIs.URI(scheme=SCHEME, host=FLEXPOOL_HOST,
+        path=flexpool_hashrate_path, query=query_flexpool_hashrate)
+    
+    r = HTTP.get(url_gethashrate)
+    response_json = JSON.parse(String(r.body))
+    return response_json["result"]["currentEffectiveHashrate"]
 end
 
 end # module
