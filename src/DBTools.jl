@@ -30,8 +30,7 @@ function loadorcreatedb()
   return db
 end
 
-function insertminingdata(pool, datetime, hashrate, balance)
-  db = loadorcreatedb()
+function insertminingdata(db, pool, datetime, hashrate, balance)
   qs = @sprintf("INSERT INTO %s VALUES ('%s', '%s', '%s', '%s');", TABLE_NAME,
     pool, datetime, hashrate, balance)
 
