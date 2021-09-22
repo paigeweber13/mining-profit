@@ -35,7 +35,7 @@ function insertminingdata(pool, datetime, hashrate, balance)
   qs = @sprintf("INSERT INTO %s VALUES ('%s', '%s', '%s', '%s');", TABLE_NAME,
     pool, datetime, hashrate, balance)
 
-  result = DBInterface.execute(db, qs)
+  DBInterface.execute(db, qs)
 end
 
 end # module
