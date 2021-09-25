@@ -6,6 +6,7 @@ using SQLite
 using Tables
 
 TABLE_NAME = "mining_stats"
+DATETIME_FORMATSTRING = "YYYY-mm-dd HH:MM:SS"
 ERROR_UNHANDLED_SQLITE_EXCEPTION = 1
 
 function loadorcreatedb()
@@ -38,9 +39,21 @@ function insertminingdata(db, pool, datetime, hashrate, balance)
   DBInterface.execute(db, qs)
 end
 
+"""
+One example of how this can be used: 
+DBTools.getdata(db, "ezil", Dates.DateTime(2021, 09, 24, 14), 
+  Dates.DateTime(2021, 09, 24, 15))
+"""
 function getdata(db::SQLite.DB, pool::String, time_start::Dates.DateTime, 
     time_end::Dates.DateTime)
-  qs = @sprintf("SELECT * FROM %s WHERE 'pool' = %s AND")
+  qs = @sprintf("""
+    SELECT * FROM '%s' WHERE pool = '%s' AND datetime >= '%s'
+    AND datetime <= '%s';
+    """,
+    TABLE_NAME, pool, Dates.format(time_start, DATETIME_FORMATSTRING),
+    Dates.format(time_end, DATETIME_FORMATSTRING)
+    )
+  return DBInterface.execute(db, qs)
 end
 
 function migratedb(inputdb, outputdb_name)
