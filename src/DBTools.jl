@@ -1,5 +1,6 @@
 module DBTools
 
+using Dates
 using Printf
 using SQLite
 using Tables
@@ -19,7 +20,7 @@ function loadorcreatedb()
         ["pool", "datetime", "hashrate", "balance"],
         [String, String, Float64, Float64]
       )
-      SQLite.createtable!(db, "mining_stats", schema_miningstats)
+      SQLite.createtable!(db, TABLE_NAME, schema_miningstats)
     else
       println("ERROR: unhandled sqlite exception: ")
       println(e)
@@ -35,6 +36,32 @@ function insertminingdata(db, pool, datetime, hashrate, balance)
     pool, datetime, hashrate, balance)
 
   DBInterface.execute(db, qs)
+end
+
+function getdata(db::SQLite.DB, pool::String, time_start::Dates.DateTime, 
+    time_end::Dates.DateTime)
+  qs = @sprintf("SELECT * FROM %s WHERE 'pool' = %s AND")
+end
+
+function migratedb(inputdb, outputdb_name)
+  outputdb = SQLite.DB(outputdb_name)
+
+  schema_miningstats = Tables.Schema(
+    ["pool", "datetime", "hashrate", "balance"],
+    [String, String, Float64, Float64]
+  )
+  SQLite.createtable!(outputdb, TABLE_NAME, schema_miningstats)
+
+  qs = @sprintf("SELECT * FROM %s;", TABLE_NAME)
+  result = DBInterface.execute(inputdb, qs)
+
+  for row in result
+    newdate = Dates.DateTime(row.datetime, "YYYY-mm-dd_HHMM")
+    newdatestring = Dates.format(newdate, "YYYY-mm-dd HH:MM:SS")
+    qs = @sprintf("INSERT INTO %s VALUES ('%s', '%s', '%s', '%s');", 
+      TABLE_NAME, row.pool, newdatestring, row.hashrate, row.balance)
+    DBInterface.execute(outputdb, qs)
+  end
 end
 
 end # module

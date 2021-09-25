@@ -13,7 +13,8 @@ function updateallstats()
     db = DBTools.loadorcreatedb()
 
     # miningpoolhub
-    datestring = Dates.format(Dates.now(), "YYYY-mm-dd_HHMM")
+    # datestring = Dates.format(Dates.now(), "YYYY-mm-dd_HHMM")
+    datestring = Dates.format(Dates.now(), "YYYY-mm-dd HH:MM:SS")
     mph_balance = ApiTools.miningpoolhub_getbalance(
         cfg["miningpoolhub"]["apikey"])
     mph_hashrate = ApiTools.miningpoolhub_gethashrate(
