@@ -70,7 +70,7 @@ function migratedb(inputdb, outputdb_name)
 
   for row in result
     newdate = Dates.DateTime(row.datetime, "YYYY-mm-dd_HHMM")
-    newdatestring = Dates.format(newdate, "YYYY-mm-dd HH:MM:SS")
+    newdatestring = Dates.format(newdate, DATETIME_FORMATSTRING)
     qs = @sprintf("INSERT INTO %s VALUES ('%s', '%s', '%s', '%s');", 
       TABLE_NAME, row.pool, newdatestring, row.hashrate, row.balance)
     DBInterface.execute(outputdb, qs)
