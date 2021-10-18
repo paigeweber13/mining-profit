@@ -36,13 +36,9 @@ function updateallstats()
 end
 
 function analyzeprofit()
-    # WIP: this is currently just a demo for how "getdata" can be used. The
-    # intention is for this function to eventually call 
-    # Analysis.jl:calculateprofitperhash with the data gained from getdata
     db = DBTools.loadorcreatedb()
-
-    return DBTools.getdata(db, "ezil", Dates.DateTime(2021, 09, 24, 14), 
-      Dates.DateTime(2021, 09, 24, 15))
+    profithistory = Analysis.gatherprofithistory(db)
+    Analysis.graphprofitovertime(profithistory)
 end
 
 end # module
