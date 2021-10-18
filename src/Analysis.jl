@@ -9,6 +9,7 @@ using SQLite
 
 TABLE_NAME = "mining_stats"
 DATETIME_FORMATSTRING = "YYYY-mm-dd HH:MM:SS"
+POOLS = ["miningpoolhub" "ezil" "flexpool"]
 
 function calculateprofitperhash(db, pool::String, time_start::Dates.DateTime, 
         time_end::Dates.DateTime)
@@ -59,8 +60,6 @@ function calculateprofitperhash(db, pool::String, time_start::Dates.DateTime,
 end
 
 function gatherprofithistory(db)
-    pools = ["miningpoolhub", "ezil", "flexpool"]
-
     qs = @sprintf("SELECT MIN(datetime) FROM %s", TABLE_NAME)
     result = DBInterface.execute(db, qs)
     startdate = missing
@@ -72,7 +71,7 @@ function gatherprofithistory(db)
 
     profithistory = Dict()   
     profithistory["datetime"] = []
-    for pool in pools
+    for pool in POOLS
         profithistory[pool] = []
     end
 
@@ -80,7 +79,7 @@ function gatherprofithistory(db)
     while enddate < Dates.now()
         push!(profithistory["datetime"], enddate)
 
-        for pool in pools
+        for pool in POOLS
             profitpermegahash = calculateprofitperhash(db, pool, startdate, 
                 enddate) * 1e6
             
@@ -99,19 +98,62 @@ function gatherprofithistory(db)
 end
 
 function graphprofitovertime(profithistory)
-    pools = ["miningpoolhub" "ezil" "flexpool"]
     x = profithistory["datetime"]
     y = Array{Union{Missing, Array{Union{Missing, Float64}}}}(
-        missing, length(pools))
+        missing, length(POOLS))
 
-    for i = 1:length(pools)
-        y[i] = profithistory[pools[i]]
+    for i = 1:length(POOLS)
+        y[i] = profithistory[POOLS[i]]
     end
 
     plot(x, y, title = "Ethereum mining pool profitability comparison",
-        label = pools, lw = 2, size = (1500, 700))
+        label = POOLS, lw = 2, size = (1500, 700))
     
     savefig("profitgraph.png")
+end
+
+function countwinsperpool(profithistory)
+    winsperpool = Dict()
+    for pool in POOLS
+        winsperpool[pool] = 0
+    end
+
+    for i = 1:length(profithistory["datetime"])
+        currentwinner = ""
+        currentwinningprofit = 0.0
+
+        for pool in POOLS
+            if ismissing(profithistory[pool][i])
+                continue
+            end
+
+            if profithistory[pool][i] > currentwinningprofit
+                currentwinner = pool
+            end
+        end
+
+        winsperpool[currentwinner] += 1
+    end
+
+    winsperpool
+end
+
+function getaveragepoolprofitability(profithistory)
+    avgprofitability = Dict()
+    for pool in POOLS
+        totalprofit = 0.0
+
+        for profit in profithistory[pool]
+            if !ismissing(profit)
+                totalprofit += profit
+            end
+        end
+
+        avgprofit = totalprofit / length(profithistory[pool])
+        avgprofitability[pool] = avgprofit
+    end
+
+    avgprofitability
 end
 
 end # module
