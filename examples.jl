@@ -12,3 +12,4 @@ config_json = MiningProfit.Config.loadconfig()
 MiningProfit.ApiTools.miningpoolhub_getbalance(
     config_json["miningpoolhub"]["apikey"])
 
+MiningProfit.analyzeprofit()

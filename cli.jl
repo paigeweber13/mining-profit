@@ -14,6 +14,9 @@ function parse_commandline()
         "--get-stats", "-s"
             help = "Get current balance and hashrate for all configured pools and store it to the local sqlite database."
             action = :store_true
+        "--analyze-profit", "-p"
+            help = "Analyze data gathered by 'get-stats' to plot profitability statistics and calculate average profitability of pools."
+            action = :store_true
         # "--opt1"
         #     help = "an option with an argument"
         # "--opt2", "-o"
@@ -36,6 +39,9 @@ function main()
 
     if parsed_args["get-stats"]
         MiningProfit.updateallstats()
+    end
+    if parsed_args["analyze-profit"]
+        MiningProfit.analyzeprofit()
     end
 end
 

@@ -39,6 +39,8 @@ function analyzeprofit()
     db = DBTools.loadorcreatedb()
     profithistory = Analysis.gatherprofithistory(db)
     Analysis.graphprofitovertime(profithistory)
+    println("Average Pool profitability:")
+    println(Analysis.getaveragepoolprofitability(profithistory))
 end
 
 end # module
