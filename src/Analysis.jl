@@ -84,10 +84,10 @@ function gatherprofithistory(db)
                 enddate) * 1e6
             
             if profitpermegahash < 0 || isnan(profitpermegahash)
-                profitperhash = missing
+                profitpermegahash = missing
             end
 
-            push!(profithistory[pool], profitperhash)
+            push!(profithistory[pool], profitpermegahash)
         end
 
         startdate = enddate
