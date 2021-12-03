@@ -98,6 +98,9 @@ function gatherprofithistory(db)
 end
 
 function graphprofitovertime(profithistory)
+    # operate in headless mode:
+    ENV["GKSwstype"] = "100"
+
     x = profithistory["datetime"]
     y = Array{Union{Missing, Array{Union{Missing, Float64}}}}(
         missing, length(POOLS))
