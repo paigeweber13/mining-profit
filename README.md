@@ -15,9 +15,11 @@ In this directory, use the following procedure to load the package and test it:
 1. In a terminal, run `julia` to start the repl
 2. Load `Pkg` with `using Pkg`
 3. We recommend using Revise: `Pkg.add("Revise"); using Revise` (if you choose
-   not to do this, you will need to restart julia after each change)
+   not to do this, you will need to re-import the MiningProfit package after 
+   each change)
 4. Activate the package: `Pkg.activate(".")`
-5. Run whatever function you want to test. Consider starting with
+5. Import MiningProfit: `using MiningProfit`
+6. Run whatever function you want to test. Consider starting with
    `MiningProfit.updateallstats()`
 
 # Running in a Production Environment
@@ -35,40 +37,41 @@ with cron or similar. Therefore we must either recompile the code on each run
 (slow) or create a precompiled system image. 
 
 To demonstrate the speedup possible, consider the following example for
-gathering mining statistics and saving them to the SQLite database. First, the
-code is run without a pre-compiled system image:
+analyzing mining statistics using previously-gathered data. First, the code
+is run without a pre-compiled system image:
 
 ```
-riley-desktop-opensuse code/mining-profit ‹main*› » date && julia cli.jl -s && date 
-Sun Sep 19 16:19:46 CDT 2021
+riley-server code/mining-profit ‹main*› » time julia cli.jl -p
   Activating environment at `~/code/mining-profit/Project.toml`
-Sun Sep 19 16:19:55 CDT 2021
-# Total runtime: 9 seconds
+Average Pool profitability:
+Dict{Any, Any}("ezil" => 4.311079369316805e-6, "miningpoolhub" => Inf, "flexpool" => 3.2907976861502096e-6)
+julia cli.jl -p  27.63s user 1.25s system 100% cpu 28.638 total
 ```
 
 Then, after creating a system image with `julia build.jl`:
 
 ```
-riley-desktop-opensuse code/mining-profit ‹main*› » date && julia --sysimage build/sys_miningprofit.so cli.jl -s && date
-Sun Sep 19 16:25:52 CDT 2021
+riley-server code/mining-profit ‹main*› » time julia --sysimage build/sys_miningprofit.so cli.jl -p
   Activating environment at `~/code/mining-profit/Project.toml`
-Sun Sep 19 16:25:54 CDT 2021
-# Total runtime: 2 seconds
+Average Pool profitability:
+Dict{Any, Any}("ezil" => 4.311079369316805e-6, "miningpoolhub" => Inf, "flexpool" => 3.2907976861502096e-6)
+julia --sysimage build/sys_miningprofit.so cli.jl -p  7.53s user 0.98s system 103% cpu 8.235 total
 ```
 
-This is a greater than 4x speedup, and at this point most of the runtime is
-surely just latency while waiting for web requests to be completed.
+This experiment shows nearly 4x speedup! For this reason, using a sysimage is
+recommended in a production environment.
 
 ## How to
 
-The method described above requires a julia repl and has significant overhead
-at launch, during which time the JIT compiler does its work. To use this tool
-in a production environment, consider pre-compiling the code as described
-below.
+The `./build.jl` script provides an easy way to build a sysimage. Follow these
+instructions:
 
-1. Make sure `PackageCompiler` is installed.
+1. Make sure `PackageCompiler` is installed
 2. In the root of this directory, run `julia build.jl` to create a precompiled
    package
 3. From now on, whenever you want to use the program, run `julia --sysimage
    build/sys_miningprofit.so cli.jl <args>` to take advantage of improved
-   speeds.
+   speeds
+4. If the code is changed (by pulling updates from git or through your own
+   edits) then you will need to re-build the sysimage
+
